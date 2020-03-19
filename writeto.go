@@ -108,8 +108,14 @@ func (w *messageWriter) closeMultipart() {
 }
 
 func (w *messageWriter) writePart(p *part, charset string) {
+
+	contentType := p.contentType
+	if !strings.Contains(p.contentType, "application/pkcs7-mime") {
+		contentType = contentType + "; charset=" + charset
+	}
+
 	w.writeHeaders(map[string][]string{
-		"Content-Type":              {p.contentType + "; charset=" + charset},
+		"Content-Type":              {contentType},
 		"Content-Transfer-Encoding": {string(p.encoding)},
 	})
 	w.writeBody(p.copier, p.encoding)
